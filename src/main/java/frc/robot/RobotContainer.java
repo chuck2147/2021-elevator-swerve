@@ -10,9 +10,12 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,6 +26,8 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
+
+  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
   private final XboxController m_controller = new XboxController(0);
 
@@ -57,8 +62,27 @@ public class RobotContainer {
     new Button(m_controller::getBackButton)
             // No requirements because we don't need to interrupt anything
             .whenPressed(m_drivetrainSubsystem::zeroGyroscope);
+
+            new JoystickButton(m_controller, XboxController.Button.kA.value)
+            //.whenPressed(elevator::elevatorPistonOff, elevator)
+            .whenPressed(new WaitCommand(0.1).andThen(elevator::elevatorBottom, elevator))
+            //.whenReleased(elevator::elevatorPistonOn, elevator)
+          ;
+          
+          new JoystickButton(m_controller, XboxController.Button.kB.value)
+            //.whenPressed(elevator::elevatorPistonOff, elevator)
+            .whenPressed(new WaitCommand(0.1).andThen(elevator::elevatorMid, elevator))
+            //.whenReleased(elevator::elevatorPistonOn, elevator)
+          ;   
+      
+          new JoystickButton(m_controller, XboxController.Button.kY.value)
+          //.whenPressed(elevator::elevatorPistonOff, elevator)
+          .whenPressed(new WaitCommand(0.1).andThen(elevator::elevatorTop, elevator))
+          //.whenReleased(elevator::elevatorPistonOn, elevator)
+          ;
   }
 
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

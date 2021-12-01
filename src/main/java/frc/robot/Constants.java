@@ -31,20 +31,36 @@ public final class Constants {
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; 
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 9; 
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(90); // FIXME Measure and set front left steer offset
+    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(90);
 
     public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3; 
     public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4; 
     public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10;
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0); // FIXME Measure and set front right steer offset
+    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0);
 
     public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
     public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
     public static final int BACK_LEFT_MODULE_STEER_ENCODER = 11;
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(75); // FIXME Measure and set back left steer offset
+    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(75);
 
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 7;
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 8;
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 12;
-    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(130); // FIXME Measure and set back right steer offset
+    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(130);
+
+    public static final int ELEVATOR_MOTOR = 9;
+	public static final int ELEVATOR_AIR_IN = 0;
+	public static final int ELEVATOR_AIR_OUT = 1;
+
+                                                // kP,  kI,  kD,  kF, kIzone, kPeakOutput
+    public static final Gains kGains = new Gains(0.2, 0.0, 1.0, 0.0, 0, 1.0);
+    public static final int kPIDLoopIdx = 0;
+    public static final int kTimeoutMs = 30;
+     
+    public static final double TARGET_POSITION_TOP = 4;
+	public static final double TARGET_POSITION_MID = 2;
+	public static final double TARGET_POSITION_BOTTOM = 0;
+    
+    /* Choose so that Talon does not report sensor out of phase */
+	public static boolean kSensorPhase = true;
 }
