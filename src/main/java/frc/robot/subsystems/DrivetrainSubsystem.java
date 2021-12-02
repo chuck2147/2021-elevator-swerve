@@ -9,6 +9,10 @@ import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -63,7 +67,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
           new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0)
   );
    private Pose2d m_pose = new Pose2d(0, 0, new Rotation2d());
- 
+   private final double SCALE = 100 / 2.54; // inches <-> meters
+   private final NetworkTableInstance nt = NetworkTableInstance.getDefault();
+  private final NetworkTable currentPoseTable = nt.getTable("/pathFollowing/current");
+  private final NetworkTableEntry currentXEntry = currentPoseTable.getEntry("x");
+  private final NetworkTableEntry currentYEntry = currentPoseTable.getEntry("y");
+  private final NetworkTableEntry currentAngleEntry = currentPoseTable.getEntry("angle");
+  
+  double length = 19.75;
+  double width = 18;
+
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
     m_kinematics, 
     new Rotation2d(0),
@@ -141,6 +154,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * Sets the gyroscope angle to zero. This can be used to set the direction the robot is currently facing to the
    * 'forwards' direction.
    */
+  private Pose2d getPose() {
+        return m_pose;
+      }
+
+  public Pose2d getScaledPose() {
+        final var m_pose = getPose();
+        final var m_translation = m_pose.getTranslation().times(SCALE);
+        final var m_rotation = m_pose.getRotation().rotateBy(new Rotation2d(Math.PI / 2));
+    
+        return new Pose2d(-m_translation.getY(), m_translation.getX(), m_rotation);
+  }
+  
+      
   public void zeroGyroscope() {
     // FIXME Remove if you are using a Pigeon
     m_pigeon.setFusedHeading(0.0);
@@ -162,6 +188,38 @@ public class DrivetrainSubsystem extends SubsystemBase {
 //    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
 //    return Rotation2d.fromDegrees(360.0 - m_navx.getYaw());
   }
+
+  public Rotation2d getYaw() {
+        double[] ypr = new double[3];
+        m_pigeon.getYawPitchRoll(ypr);
+        return Rotation2d.fromDegrees(ypr[0]);
+      }
+
+      private void updatePoseNT() {
+        final var pose = getScaledPose();
+        // System.out.println(pose);
+    
+        currentAngleEntry.setDouble(pose.getRotation().getRadians());
+        currentXEntry.setDouble(pose.getX());
+        currentYEntry.setDouble(pose.getY());
+    
+      }
+
+  public void resetPose(Vector2d translation, Rotation2d angle) {
+        System.out.println("Reset Pose");
+        zeroGyroscope();
+        m_odometry.resetPosition(
+          new Pose2d(
+            //coordinates switched x is forward, y is left and right.
+            // Converting to unit system of path following which uses x for right and left
+            new Translation2d(translation.y / SCALE, -translation.x / SCALE),
+            new Rotation2d(angle.getRadians())
+          ),
+          getYaw()
+        );
+        m_pose = m_odometry.getPoseMeters();
+        updatePoseNT();
+      }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
