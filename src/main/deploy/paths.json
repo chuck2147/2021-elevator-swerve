@@ -1,0 +1,33 @@
+{
+  "Drive forward": {
+    "waypoints": [
+      {
+        "x": 233.4592544790181,
+        "y": 119.84152809025811,
+        "heading": 0,
+        "handleBeforeLength": 20,
+        "handleAfterLength": 20
+      },
+      {
+        "x": 265.78697118881485,
+        "y": 60.09645361496054,
+        "heading": 0,
+        "handleBeforeLength": 20,
+        "handleAfterLength": 20
+      }
+    ],
+    "angles": [
+      {
+        "afterWaypoint": 0,
+        "t": 0.1,
+        "angle": 1.5707963267948966
+      },
+      {
+        "afterWaypoint": 0,
+        "t": 0.9,
+        "angle": 1.5707963267948966
+      }
+    ],
+    "maxVelocity": 3
+  }
+}

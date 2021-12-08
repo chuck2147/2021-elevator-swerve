@@ -110,10 +110,11 @@ public class FollowPathCommand extends CommandBase {
       betweenPoint.velocity.y*translation_kF_y
     );
 
-    // final var translationVector = feedForwardTranslationVector.add(
-    //         pid_x.calculate(currentPose.getX(), betweenPoint.x),
-    //         pid_y.calculate(currentPose.getY(), betweenPoint.y));
-    final var translationVector = feedForwardTranslationVector;
+    final var translationVector = new Vector2d(
+      feedForwardTranslationVector.x + pid_x.calculate(currentPose.getX(), betweenPoint.x),
+      feedForwardTranslationVector.y + pid_y.calculate(currentPose.getY(), betweenPoint.y)
+    );
+    //final var translationVector = feedForwardTranslationVector;
     System.out.println(currentPose);
     final var rotationPidResult = pid_rotation.calculate(currentPose.getRotation().getRadians(), betweenPoint.angle);
     final var rotationResult = betweenPoint.angularVelocity * rotation_kF + rotationPidResult;
