@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.NTValue;
+import frc.robot.PIDNTValue;
 import frc.robot.motion.Trajectory;
 import frc.robot.motion.TrajectoryPoint;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -21,14 +23,14 @@ public class FollowPathCommand extends CommandBase {
 
   private final String pathName;
 
-  private final double translation_kF_x = 0.006735;
-  private final double translation_kF_y = 0.02;
-  private final double translation_kP = 0.0;
+  private final double translation_kF_x = -0.0229;
+  private final double translation_kF_y = 0.0225;
+  private final double translation_kP = 1.0;
   private final double translation_kI = 0.0;
   private final double translation_kD = 0.0;
 
   private final double rotation_kF = 0.013;
-  private final double rotation_kP = 0.0;
+  private final double rotation_kP = 1.0;
   private final double rotation_kI = 0.0;
   private final double rotation_kD = 0.0;
   private final PIDController pid_x = new PIDController(translation_kP, translation_kI, translation_kD);
@@ -36,12 +38,14 @@ public class FollowPathCommand extends CommandBase {
   private final PIDController pid_rotation = new PIDController(rotation_kP, rotation_kI, rotation_kD);
 
   private static final NetworkTableInstance nt = NetworkTableInstance.getDefault();
-  private static final NetworkTable pathFollowingTable = nt.getTable("/pathFollowing");
-  private static final NetworkTable targetPoseTable = nt.getTable("/pathFollowing/target");
+  private static final NetworkTable pathFollowingTable = nt.getTable("PathFollowing");
+  private static final NetworkTable targetPoseTable = nt.getTable("PathFollowing Target");
   private static final NetworkTableEntry targetXEntry = targetPoseTable.getEntry("x");
+  //private final NTValue translations_kF_x_NtValue = new NTValue(translation_kF_x, "TranslationFeedForward_X");
   private static final NetworkTableEntry targetYEntry = targetPoseTable.getEntry("y");
-  private static final NetworkTableEntry targetAngleEntry = targetPoseTable.getEntry("angle");
-  private static final NetworkTableEntry currentPathEntry = pathFollowingTable.getEntry("currentPath");
+  //private final NTValue translations_kF_y_NtValue = new NTValue(translation_kF_y, "TranslationFeedForward_Y");
+  private static final NetworkTableEntry targetAngleEntry = targetPoseTable.getEntry("Angle");
+  private static final NetworkTableEntry currentPathEntry = pathFollowingTable.getEntry("Current Path");
 
   private static boolean isFirstPath = true;
 
@@ -72,6 +76,8 @@ public class FollowPathCommand extends CommandBase {
     isFirstPath = false;
 
     currentPathEntry.setValue(pathName);
+
+    startTime = 59;
   }
 
   @Override
@@ -110,9 +116,12 @@ public class FollowPathCommand extends CommandBase {
       betweenPoint.velocity.y*translation_kF_y
     );
 
+    var pidPointX = pid_x.calculate(currentPose.getX(), betweenPoint.x);    
+    var pidPointY = pid_y.calculate(currentPose.getY(), betweenPoint.y);
+
     final var translationVector = new Vector2d(
-      feedForwardTranslationVector.x + pid_x.calculate(currentPose.getX(), betweenPoint.x),
-      feedForwardTranslationVector.y + pid_y.calculate(currentPose.getY(), betweenPoint.y)
+      feedForwardTranslationVector.x + pidPointX,
+      feedForwardTranslationVector.y + pidPointY
     );
     //final var translationVector = feedForwardTranslationVector;
     System.out.println(currentPose);

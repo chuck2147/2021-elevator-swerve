@@ -2,15 +2,46 @@
   "Drive forward": {
     "waypoints": [
       {
-        "x": 233.4592544790181,
-        "y": 119.84152809025811,
+        "x": 39.50610005731598,
+        "y": 222.91418910520204,
+        "heading": -3.365775740499719,
+        "handleBeforeLength": 20,
+        "handleAfterLength": 17.58014839420799
+      },
+      {
+        "x": 95.25259968885617,
+        "y": 118.6688503805687,
+        "heading": 0,
+        "handleBeforeLength": 20,
+        "handleAfterLength": 20
+      }
+    ],
+    "angles": [
+      {
+        "afterWaypoint": 0,
+        "t": 0,
+        "angle": 1.5707963267948966
+      },
+      {
+        "afterWaypoint": 0,
+        "t": 0.9980000000000008,
+        "angle": 1.5707963267948966
+      }
+    ],
+    "maxVelocity": 3
+  },
+  "Trench to Triangle": {
+    "waypoints": [
+      {
+        "x": 40.53844264308525,
+        "y": 222.91418910520204,
         "heading": 0,
         "handleBeforeLength": 20,
         "handleAfterLength": 20
       },
       {
-        "x": 265.78697118881485,
-        "y": 60.09645361496054,
+        "x": 94.2202571030869,
+        "y": 18.55203992225757,
         "heading": 0,
         "handleBeforeLength": 20,
         "handleAfterLength": 20

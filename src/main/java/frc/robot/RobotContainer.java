@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.autonomous.DriveForward;
+import frc.robot.commands.autonomous.TrenchToTriangleCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 
@@ -55,7 +56,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     autoChooser.setDefaultOption("Drive Forward", new DriveForward(m_drivetrainSubsystem));
-    autoChooser.addOption("Drive Forward", new DriveForward(m_drivetrainSubsystem));
+    autoChooser.addOption("Trench To Triangle", new TrenchToTriangleCommand(m_drivetrainSubsystem));
 
     SmartDashboard.putData("Auto Selector", autoChooser); 
   }
