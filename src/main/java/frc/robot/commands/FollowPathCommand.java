@@ -100,9 +100,12 @@ public class FollowPathCommand extends CommandBase {
                 beforePoint = i > 0 ? trajectory.points[i - 1] : point;
             }
         }
-
-        var percent = (timeStamp - beforePoint.time) / (afterPoint.time - beforePoint.time);
-        betweenPoint = TrajectoryPoint.createTrajectoryPointBetween(beforePoint, afterPoint, percent);
+        if (afterPoint == beforePoint) {
+          betweenPoint = beforePoint;
+        } else {
+          var percent = (timeStamp - beforePoint.time) / (afterPoint.time - beforePoint.time);
+          betweenPoint = TrajectoryPoint.createTrajectoryPointBetween(beforePoint, afterPoint, percent);
+        }
     }
 
     targetXEntry.setValue(betweenPoint.x);
