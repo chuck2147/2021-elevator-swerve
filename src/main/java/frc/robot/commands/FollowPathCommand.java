@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.NTValue;
+import frc.robot.PIDNTValue;
 import frc.robot.motion.Trajectory;
 import frc.robot.motion.TrajectoryPoint;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -34,8 +36,12 @@ public class FollowPathCommand extends CommandBase {
   private final PIDController pid_x = new PIDController(translation_kP, translation_kI, translation_kD);
   private final PIDController pid_y = new PIDController(translation_kP, translation_kI, translation_kD);
   private final PIDController pid_rotation = new PIDController(rotation_kP, rotation_kI, rotation_kD);
-
   private static final NetworkTableInstance nt = NetworkTableInstance.getDefault();
+  //Since y and x use the same pid values other than F I will but P I and D into the sae PIDNTValue. 
+  private final PIDNTValue pid_PIDNT_x_y = new PIDNTValue(translation_kP, translation_kI, translation_kD, pid_x, "Follow Path pid_x and pid_y");
+  private final PIDNTValue pid_PIDNT_rotation = new PIDNTValue(rotation_kP, rotation_kI, rotation_kD, pid_rotation, "Follow Path pid_rotation");
+  private final NTValue pid_NT_translation_kF_x = new NTValue(translation_kF_x, "Translation_kF_x");
+  private final NTValue pid_NT_translation_kF_y = new NTValue(translation_kF_y, "Translation_kF_y");
   private static final NetworkTable pathFollowingTable = nt.getTable("/pathFollowing");
   private static final NetworkTable targetPoseTable = nt.getTable("/pathFollowing/target");
   private static final NetworkTableEntry targetXEntry = targetPoseTable.getEntry("x");
