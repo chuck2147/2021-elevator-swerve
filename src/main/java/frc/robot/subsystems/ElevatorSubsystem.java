@@ -50,23 +50,27 @@ public class ElevatorSubsystem extends SubsystemBase {
   //TODO: Reset encoder to 0 when switch is triggered
 
 
-  public void stopElevator() {
+  public boolean stopElevator() {
     elevatorMotor.set(TalonFXControlMode.PercentOutput, 0);
+    return false;
   }
 
-  public void elevatorTop() {
+  public boolean elevatorTop() {
     elevatorMotor.set(TalonFXControlMode.Position, Constants.TARGET_POSITION_TOP 
       * ELEVATOR_POSITION_SENSOR_COEFFICIENT);
+    return false;
   }
 
-  public void elevatorMid() {
+  public boolean elevatorMid() {
     elevatorMotor.set(TalonFXControlMode.Position, Constants.TARGET_POSITION_MID
       * ELEVATOR_POSITION_SENSOR_COEFFICIENT);
+    return false;
   }
   
-  public void elevatorBottom() {
+  public boolean elevatorBottom() {
     elevatorMotor.set(TalonFXControlMode.Position, Constants.TARGET_POSITION_BOTTOM
       * ELEVATOR_POSITION_SENSOR_COEFFICIENT);
+    return false;
 
   }
 

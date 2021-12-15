@@ -59,7 +59,10 @@ public final class Constants {
      
     public static final double TARGET_POSITION_TOP = 4;
 	public static final double TARGET_POSITION_MID = 2;
-	public static final double TARGET_POSITION_BOTTOM = 0;
+    public static final double TARGET_POSITION_BOTTOM = 0;
+    public enum ElevatorPosition{
+        bottom, middle, up, stop
+    }
     
     /* Choose so that Talon does not report sensor out of phase */
 	public static boolean kSensorPhase = true;
