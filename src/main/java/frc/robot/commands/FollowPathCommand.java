@@ -38,10 +38,10 @@ public class FollowPathCommand extends CommandBase {
   private final PIDController pid_rotation = new PIDController(rotation_kP, rotation_kI, rotation_kD);
   private static final NetworkTableInstance nt = NetworkTableInstance.getDefault();
   //Since y and x use the same pid values other than F I will but P I and D into the sae PIDNTValue. 
-  private final PIDNTValue pid_PIDNT_x_y = new PIDNTValue(translation_kP, translation_kI, translation_kD, pid_x, "Follow Path pid_x and pid_y");
-  private final PIDNTValue pid_PIDNT_rotation = new PIDNTValue(rotation_kP, rotation_kI, rotation_kD, pid_rotation, "Follow Path pid_rotation");
-  private final NTValue pid_NT_translation_kF_x = new NTValue(translation_kF_x, "Translation_kF_x");
-  private final NTValue pid_NT_translation_kF_y = new NTValue(translation_kF_y, "Translation_kF_y");
+  // private final PIDNTValue pid_PIDNT_x_y = new PIDNTValue(translation_kP, translation_kI, translation_kD, pid_x, "Follow Path pid_x and pid_y");
+  // private final PIDNTValue pid_PIDNT_rotation = new PIDNTValue(rotation_kP, rotation_kI, rotation_kD, pid_rotation, "Follow Path pid_rotation");
+  // private final NTValue pid_NT_translation_kF_x = new NTValue(translation_kF_x, "Translation_kF_x");
+  // private final NTValue pid_NT_translation_kF_y = new NTValue(translation_kF_y, "Translation_kF_y");
   private static final NetworkTable pathFollowingTable = nt.getTable("/pathFollowing");
   private static final NetworkTable targetPoseTable = nt.getTable("/pathFollowing/target");
   private static final NetworkTableEntry targetXEntry = targetPoseTable.getEntry("x");
@@ -80,8 +80,6 @@ public class FollowPathCommand extends CommandBase {
     isFirstPath = false;
 
     currentPathEntry.setValue(pathName);
-
-    startTime = 59;
   }
 
   @Override
@@ -123,19 +121,21 @@ public class FollowPathCommand extends CommandBase {
       betweenPoint.velocity.y*translation_kF_y
     );
 
-    var pidPointX = pid_x.calculate(currentPose.getX(), betweenPoint.x);    
-    var pidPointY = pid_y.calculate(currentPose.getY(), betweenPoint.y);
+    // var pidPointX = pid_x.calculate(currentPose.getX(), betweenPoint.x);    
+    // var pidPointY = pid_y.calculate(currentPose.getY(), betweenPoint.y);
 
-    final var translationVector = new Vector2d(
-      feedForwardTranslationVector.x + pidPointX,
-      feedForwardTranslationVector.y + pidPointY
-    );
-    //final var translationVector = feedForwardTranslationVector;
-    System.out.println(currentPose);
+    // final var translationVector = new Vector2d(
+    //   feedForwardTranslationVector.x + pidPointX,
+    //   feedForwardTranslationVector.y + pidPointY
+    // );
+    final var translationVector = feedForwardTranslationVector;
+    //System.out.println(currentPose);
+    //System.out.println(translationVector.x + " " + translationVector.y);
     final var rotationPidResult = pid_rotation.calculate(currentPose.getRotation().getRadians(), betweenPoint.angle);
     final var rotationResult = betweenPoint.angularVelocity * rotation_kF + rotationPidResult;
 
-    drivetrain.drive(new ChassisSpeeds(translationVector.y, translationVector.x, rotationResult));
+    drivetrain.drive(new ChassisSpeeds(translationVector.y, translationVector.x, 0));
+    // drivetrain.drive(new ChassisSpeeds(translationVector.y, translationVector.x, rotationResult));
   }
 
   @Override

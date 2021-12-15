@@ -67,7 +67,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
           new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0)
   );
    private Pose2d m_pose = new Pose2d(0, 0, new Rotation2d());
-   private final double SCALE = 100 / 2.54; // inches <-> meters
+   private final double SCALE = 100 / 2.54 * 0.8; // inches <-> meters and compensating for error
    private final NetworkTableInstance nt = NetworkTableInstance.getDefault();
   private final NetworkTable currentPoseTable = nt.getTable("/pathFollowing/current");
   private final NetworkTableEntry currentXEntry = currentPoseTable.getEntry("x");
@@ -96,6 +96,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
   public DrivetrainSubsystem() {
+    zeroGyroscope();
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
     m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
@@ -177,7 +178,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   public Rotation2d getGyroscopeRotation() {
     // FIXME Remove if you are using a Pigeon
-    return Rotation2d.fromDegrees(m_pigeon.getFusedHeading());
+    return Rotation2d.fromDegrees(-m_pigeon.getFusedHeading());
 
     // FIXME Uncomment if you are using a NavX
 //    if (m_navx.isMagnetometerCalibrated()) {
@@ -189,21 +190,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
 //    return Rotation2d.fromDegrees(360.0 - m_navx.getYaw());
   }
 
-  public Rotation2d getYaw() {
-        double[] ypr = new double[3];
-        m_pigeon.getYawPitchRoll(ypr);
-        return Rotation2d.fromDegrees(ypr[0]);
-      }
+  private void updatePoseNT() {
+    final var pose = getScaledPose();
+    // System.out.println(pose);
 
-      private void updatePoseNT() {
-        final var pose = getScaledPose();
-        // System.out.println(pose);
-    
-        currentAngleEntry.setDouble(pose.getRotation().getRadians());
-        currentXEntry.setDouble(pose.getX());
-        currentYEntry.setDouble(pose.getY());
-    
-      }
+    currentAngleEntry.setDouble(pose.getRotation().getRadians());
+    currentXEntry.setDouble(pose.getX());
+    currentYEntry.setDouble(pose.getY());
+
+  }
 
   public void resetPose(Vector2d translation, Rotation2d angle) {
         System.out.println("Reset Pose");
@@ -215,7 +210,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             new Translation2d(translation.y / SCALE, -translation.x / SCALE),
             new Rotation2d(angle.getRadians())
           ),
-          getYaw()
+          getGyroscopeRotation()
         );
         m_pose = m_odometry.getPoseMeters();
         updatePoseNT();
@@ -236,6 +231,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());
 
     m_pose = m_odometry.update(getGyroscopeRotation(), states[0], states[1], states[2], states[3]);
-    //System.out.println(getGyroscopeRotation());
+    updatePoseNT();
+    System.out.println(getGyroscopeRotation());
+    m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   }
 }
