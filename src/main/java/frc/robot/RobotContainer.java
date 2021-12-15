@@ -39,6 +39,8 @@ public class RobotContainer {
    */
   private final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
+private Button whenPressed;
+
   public RobotContainer() {
     // Set up the default command for the drivetrain.
     // The controls are for field-oriented driving:
@@ -89,6 +91,13 @@ public class RobotContainer {
           .whenPressed(new WaitCommand(0.1).andThen(elevator::elevatorTop, elevator))
           //.whenReleased(elevator::elevatorPistonOn, elevator)
           ;
+          whenPressed = new JoystickButton(m_controller, XboxController.Button.kX.value)
+         //.whenPressed(elevator::elevatorPistonOff, elevator)
+        .whenPressed(new WaitCommand(0.1).andThen(elevator::stopElevator, elevator))
+        //.whenReleased(elevator stops)
+          ;
+        
+
   }
 
   
