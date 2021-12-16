@@ -67,15 +67,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
           new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0)
   );
    private Pose2d m_pose = new Pose2d(0, 0, new Rotation2d());
-   private final double SCALE = 100 / 2.54 * 0.8; // inches <-> meters and compensating for error
+   private final double SCALE_X = 100 / 2.54 * 1; // inches <-> meters and compensating for error
+   private final double SCALE_Y = 100 / 2.54 * 1;
    private final NetworkTableInstance nt = NetworkTableInstance.getDefault();
   private final NetworkTable currentPoseTable = nt.getTable("/pathFollowing/current");
   private final NetworkTableEntry currentXEntry = currentPoseTable.getEntry("x");
   private final NetworkTableEntry currentYEntry = currentPoseTable.getEntry("y");
   private final NetworkTableEntry currentAngleEntry = currentPoseTable.getEntry("angle");
   
-  double length = 19.75;
-  double width = 18;
+  double length = 19;
+  double width = 20;
 
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
     m_kinematics, 
@@ -150,6 +151,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
             BACK_RIGHT_MODULE_STEER_OFFSET
     );
   }
+  public Translation2d times() {
+    final var m_translation = m_pose.getTranslation();
+    return new Translation2d(m_translation.getX() * SCALE_X, m_translation.getY() * SCALE_Y);
+  }
 
   /**
    * Sets the gyroscope angle to zero. This can be used to set the direction the robot is currently facing to the
@@ -160,11 +165,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
       }
 
   public Pose2d getScaledPose() {
-        final var m_pose = getPose();
-        final var m_translation = m_pose.getTranslation().times(SCALE);
-        final var m_rotation = m_pose.getRotation().rotateBy(new Rotation2d(Math.PI / 2));
+        m_pose = getPose();
+        final var translation = times();
+        final var rotation = m_pose.getRotation().rotateBy(new Rotation2d(Math.PI / 2));
     
-        return new Pose2d(-m_translation.getY(), m_translation.getX(), m_rotation);
+        return new Pose2d(-translation.getY(), translation.getX(), rotation);
   }
   
       
@@ -207,7 +212,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
           new Pose2d(
             //coordinates switched x is forward, y is left and right.
             // Converting to unit system of path following which uses x for right and left
-            new Translation2d(translation.y / SCALE, -translation.x / SCALE),
+            new Translation2d(translation.y / SCALE_Y, -translation.x / SCALE_X),
             new Rotation2d(angle.getRadians())
           ),
           getGyroscopeRotation()
@@ -232,7 +237,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     m_pose = m_odometry.update(getGyroscopeRotation(), states[0], states[1], states[2], states[3]);
     updatePoseNT();
-    System.out.println(getGyroscopeRotation());
+    //System.out.println(getGyroscopeRotation());
     m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   }
 }

@@ -23,14 +23,14 @@ public class FollowPathCommand extends CommandBase {
 
   private final String pathName;
 
-  private final double translation_kF_x = -0.0229;
-  private final double translation_kF_y = 0.0225;
-  private final double translation_kP = 1.0;
+  private final double translation_kF_x = -0.018;
+  private final double translation_kF_y = 0.025;
+  private final double translation_kP = 0.1;
   private final double translation_kI = 0.0;
   private final double translation_kD = 0.0;
 
-  private final double rotation_kF = 0.013;
-  private final double rotation_kP = 1.0;
+  private final double rotation_kF = 0.009;
+  private final double rotation_kP = 0.1;
   private final double rotation_kI = 0.0;
   private final double rotation_kD = 0.0;
   private final PIDController pid_x = new PIDController(translation_kP, translation_kI, translation_kD);
@@ -121,21 +121,21 @@ public class FollowPathCommand extends CommandBase {
       betweenPoint.velocity.y*translation_kF_y
     );
 
-    // var pidPointX = pid_x.calculate(currentPose.getX(), betweenPoint.x);    
-    // var pidPointY = pid_y.calculate(currentPose.getY(), betweenPoint.y);
+    var pidPointX = pid_x.calculate(currentPose.getX(), betweenPoint.x);    
+    var pidPointY = pid_y.calculate(currentPose.getY(), betweenPoint.y);
 
     // final var translationVector = new Vector2d(
     //   feedForwardTranslationVector.x + pidPointX,
     //   feedForwardTranslationVector.y + pidPointY
     // );
     final var translationVector = feedForwardTranslationVector;
-    //System.out.println(currentPose);
-    //System.out.println(translationVector.x + " " + translationVector.y);
+    System.out.println(betweenPoint.x + " " + betweenPoint.y);
+    System.out.println(pidPointX + " " + pidPointY);
     final var rotationPidResult = pid_rotation.calculate(currentPose.getRotation().getRadians(), betweenPoint.angle);
-    final var rotationResult = betweenPoint.angularVelocity * rotation_kF + rotationPidResult;
+    final var rotationResult = betweenPoint.angularVelocity * rotation_kF; //+ rotationPidResult;
 
-    drivetrain.drive(new ChassisSpeeds(translationVector.y, translationVector.x, 0));
-    // drivetrain.drive(new ChassisSpeeds(translationVector.y, translationVector.x, rotationResult));
+    //drivetrain.drive(new ChassisSpeeds(translationVector.y, translationVector.x, 0));
+    drivetrain.drive(new ChassisSpeeds(translationVector.y, translationVector.x, rotationResult));
   }
 
   @Override
